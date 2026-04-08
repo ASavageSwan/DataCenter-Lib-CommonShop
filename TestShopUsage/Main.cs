@@ -1,5 +1,6 @@
 ﻿using Il2Cpp;
 using MelonLoader;
+using MelonLoader.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -17,7 +18,7 @@ public class Main : MelonMod
         // 1. Initialize the library patches manually
         // This ensures the library only runs when a mod actually needs it. a
         ShopAPI.Initialize(this.HarmonyInstance);
-
+        RunJsonSaveTest();
         ShopAPI.RegisterItem(new CustomShopItem
         {
             Name = "Test Bulk Box (99x)",
@@ -198,5 +199,59 @@ public class Main : MelonMod
             TemplateID = 0,
             ResultItemID = 100 
         });
+    }
+    
+    private void RunJsonSaveTest()
+    {
+        MelonLoader.MelonLogger.Msg("=========================================");
+        MelonLoader.MelonLogger.Msg("      RUNNING JSON FILE SAVE TEST        ");
+        MelonLoader.MelonLogger.Msg("=========================================");
+
+        // Step 1: Trigger the save by registering a brand new custom ID
+        int fakeCustomID = 7777; // Use a random high number so it doesn't conflict with real items
+        
+        ShopAPI.RegisterItem(new CustomShopItem
+        {
+            Name = "Automated Test Item",
+            Price = 1,
+            Category = "Testing",
+            TemplateType = (Il2Cpp.PlayerManager.ObjectInHand)fakeCustomID, // This triggers the JSON save!
+            TemplateID = 0
+        });
+
+        // Step 2: Locate the expected file path
+        string filePath = System.IO.Path.Combine(MelonEnvironment.UserDataDirectory, "CommonShop_CustomIDs.json");
+        MelonLoader.MelonLogger.Msg($"Checking path: {filePath}");
+
+        // Step 3: Verify the file exists
+        if (!System.IO.File.Exists(filePath))
+        {
+            MelonLoader.MelonLogger.Error("[TEST FAIL] The JSON file was NOT created on the disk!");
+            return;
+        }
+
+        // Step 4: Read the file and verify the contents
+        try
+        {
+            string jsonContent = System.IO.File.ReadAllText(filePath);
+            
+            // Check if our specific fake ID and Item Name made it into the file
+            if (jsonContent.Contains("\"7777\"") && jsonContent.Contains("Automated Test Item"))
+            {
+                MelonLoader.MelonLogger.Msg("[TEST PASS] The file exists AND the data was written perfectly!");
+                MelonLoader.MelonLogger.Msg($"\n--- LIVE FILE CONTENTS ---\n{jsonContent}\n--------------------------");
+            }
+            else
+            {
+                MelonLoader.MelonLogger.Error("[TEST FAIL] The file exists, but our test data is missing!");
+                MelonLoader.MelonLogger.Error($"\n--- LIVE FILE CONTENTS ---\n{jsonContent}\n--------------------------");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            MelonLoader.MelonLogger.Error($"[TEST FAIL] Could not read the file due to an error: {ex.Message}");
+        }
+        
+        MelonLoader.MelonLogger.Msg("=========================================");
     }
 }

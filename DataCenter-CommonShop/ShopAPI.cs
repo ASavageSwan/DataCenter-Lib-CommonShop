@@ -15,7 +15,7 @@ public static class ShopAPI
     internal static List<CustomShopItem> RegisteredItems => _registeredItems;
     private static bool _initialized = false;
     
-    private static Dictionary<int, RegistryEntry> _usedCustomIDs = new();
+    private static Dictionary<int, Dictionary<string, string>> _usedCustomIDs = new();
     private static string RegistryFilePath => Path.Combine(MelonEnvironment.UserDataDirectory, "CommonShop_CustomIDs.json");
     
     public static void Initialize(HarmonyLib.Harmony harmony)
@@ -59,18 +59,27 @@ public static class ShopAPI
         if (!Enum.IsDefined(typeof(PlayerManager.ObjectInHand), item.TemplateType))
         {
             int customId = (int)item.TemplateType;
-            if (_usedCustomIDs.TryGetValue(customId, out RegistryEntry existingEntry))
+            
+            if (_usedCustomIDs.TryGetValue(customId, out Dictionary<string, string> existingEntry))
             {
-                if (existingEntry.ModName != modName)
+                string existingMod = existingEntry.ContainsKey("ModName") ? existingEntry["ModName"] : "Unknown Mod";
+                string existingItem = existingEntry.ContainsKey("ItemName") ? existingEntry["ItemName"] : "Unknown Item";
+
+                if (existingMod != modName)
                 {
                     MelonLogger.Error($"[ShopLib] FATAL ID COLLISION! Mod '{modName}' tried to register custom ID [{customId}].");
-                    MelonLogger.Error($"[ShopLib] -> That ID is permanently registered to '{existingEntry.ModName}' for the item '{existingEntry.ItemName}'. Skipping item to prevent corruption.");
+                    MelonLogger.Error($"[ShopLib] -> That ID is permanently registered to '{existingMod}' for the item '{existingItem}'. Skipping item to prevent corruption.");
                     return; 
                 }
             }
             else
             {
-                _usedCustomIDs[customId] = new RegistryEntry { ModName = modName, ItemName = item.Name };
+                _usedCustomIDs[customId] = new Dictionary<string, string>
+                {
+                    { "ModName", modName },
+                    { "ItemName", item.Name }
+                };
+                
                 SaveIDRegistry();
                 MelonLogger.Msg($"[ShopLib] Registered new custom ID [{customId}] to mod '{modName}' for '{item.Name}'.");
             }
@@ -195,8 +204,7 @@ public static class ShopAPI
 
         try
         {
-            // Try to load the new JSON format
-            var loadedDict = JsonSerializer.Deserialize<Dictionary<int, RegistryEntry>>(jsonString);
+            var loadedDict = JsonSerializer.Deserialize<Dictionary<int, Dictionary<string, string>>>(jsonString);
             if (loadedDict != null) _usedCustomIDs = loadedDict;
             
             MelonLogger.Msg($"[ShopLib] Loaded {_usedCustomIDs.Count} claimed custom IDs from JSON registry.");
@@ -210,16 +218,20 @@ public static class ShopAPI
                 {
                     foreach (var kvp in legacyDict)
                     {
-                        _usedCustomIDs[kvp.Key] = new RegistryEntry { ModName = kvp.Value, ItemName = "Unknown (Legacy Format)" };
+                        _usedCustomIDs[kvp.Key] = new Dictionary<string, string> 
+                        { 
+                            { "ModName", kvp.Value }, 
+                            { "ItemName", "Unknown (Legacy Format)" } 
+                        };
                     }
-                    SaveIDRegistry();
+                    SaveIDRegistry(); 
                     MelonLogger.Msg($"[ShopLib] Successfully upgraded legacy JSON registry to new format.");
                 }
             }
             catch (Exception ex)
             {
                 MelonLogger.Error($"[ShopLib] Failed to load or upgrade JSON ID Registry: {ex}");
-                _usedCustomIDs = new Dictionary<int, RegistryEntry>(); 
+                _usedCustomIDs = new Dictionary<int, Dictionary<string, string>>(); 
             }
         }
     }
