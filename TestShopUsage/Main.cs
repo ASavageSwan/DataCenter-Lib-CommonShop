@@ -1,5 +1,6 @@
 ﻿using Il2Cpp;
 using MelonLoader;
+using MelonLoader.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -17,7 +18,7 @@ public class Main : MelonMod
         // 1. Initialize the library patches manually
         // This ensures the library only runs when a mod actually needs it. a
         ShopAPI.Initialize(this.HarmonyInstance);
-
+        RunJsonSaveTest();
         ShopAPI.RegisterItem(new CustomShopItem
         {
             Name = "Test Bulk Box (99x)",
@@ -160,10 +161,97 @@ public class Main : MelonMod
         ShopAPI.RegisterItem(new CustomShopItem
         {
             SubCategory = "Bulk Shipments",
-            Name = "RGB Disco Server 32",
+            Name = "RGB Disco Server 33",
             Price = 5020,
             TemplateType = Il2Cpp.PlayerManager.ObjectInHand.Server1U,
             TemplateID = 0
         });
+        
+        // --- TEST 1: Internal Conflict Test ---
+// We register an item, then immediately try to register another with the exact same Name.
+        ShopAPI.RegisterItem(new CustomShopItem { 
+            Name = "Internal Conflict Server", 
+            Price = 100, 
+            TemplateType = PlayerManager.ObjectInHand.Server1U, 
+            TemplateID = 0 
+        });
+        ShopAPI.RegisterItem(new CustomShopItem { 
+            Name = "Internal Conflict Server", // Identical Name
+            Price = 200, 
+            TemplateType = PlayerManager.ObjectInHand.SFPBox, 
+            TemplateID = 0 
+        });
+
+        // --- TEST 2: External Name Conflict Test ---
+        ShopAPI.RegisterItem(new CustomShopItem {
+            Name = "5x QSFP-DD 400Gbps", 
+            Price = 10,
+            TemplateType = PlayerManager.ObjectInHand.SFPBox,
+            TemplateID = 0
+        });
+
+        // --- TEST 3: External ID Conflict Test ---
+        // It uses SFPBox (which is TemplateType PlayerManager.ObjectInHand.SFPBox).
+        ShopAPI.RegisterItem(new CustomShopItem {
+            Name = "My Custom Box Mod",
+            Price = 500,
+            TemplateType = PlayerManager.ObjectInHand.SFPBox,
+            TemplateID = 0,
+            ResultItemID = 100 
+        });
+    }
+    
+    private void RunJsonSaveTest()
+    {
+        MelonLoader.MelonLogger.Msg("=========================================");
+        MelonLoader.MelonLogger.Msg("      RUNNING JSON FILE SAVE TEST        ");
+        MelonLoader.MelonLogger.Msg("=========================================");
+
+        // Step 1: Trigger the save by registering a brand new custom ID
+        int fakeCustomID = 7777; // Use a random high number so it doesn't conflict with real items
+        
+        ShopAPI.RegisterItem(new CustomShopItem
+        {
+            Name = "Automated Test Item",
+            Price = 1,
+            Category = "Testing",
+            TemplateType = (Il2Cpp.PlayerManager.ObjectInHand)fakeCustomID, // This triggers the JSON save!
+            TemplateID = 0
+        });
+
+        // Step 2: Locate the expected file path
+        string filePath = System.IO.Path.Combine(MelonEnvironment.UserDataDirectory, "CommonShop_CustomIDs.json");
+        MelonLoader.MelonLogger.Msg($"Checking path: {filePath}");
+
+        // Step 3: Verify the file exists
+        if (!System.IO.File.Exists(filePath))
+        {
+            MelonLoader.MelonLogger.Error("[TEST FAIL] The JSON file was NOT created on the disk!");
+            return;
+        }
+
+        // Step 4: Read the file and verify the contents
+        try
+        {
+            string jsonContent = System.IO.File.ReadAllText(filePath);
+            
+            // Check if our specific fake ID and Item Name made it into the file
+            if (jsonContent.Contains("\"7777\"") && jsonContent.Contains("Automated Test Item"))
+            {
+                MelonLoader.MelonLogger.Msg("[TEST PASS] The file exists AND the data was written perfectly!");
+                MelonLoader.MelonLogger.Msg($"\n--- LIVE FILE CONTENTS ---\n{jsonContent}\n--------------------------");
+            }
+            else
+            {
+                MelonLoader.MelonLogger.Error("[TEST FAIL] The file exists, but our test data is missing!");
+                MelonLoader.MelonLogger.Error($"\n--- LIVE FILE CONTENTS ---\n{jsonContent}\n--------------------------");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            MelonLoader.MelonLogger.Error($"[TEST FAIL] Could not read the file due to an error: {ex.Message}");
+        }
+        
+        MelonLoader.MelonLogger.Msg("=========================================");
     }
 }
