@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCenter-CommonShop", "DataCenter-CommonShop\DataCenter-CommonShop.csproj", "{CC213FC2-202C-4660-B396-BEA78DFE06A8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestShopUsage", "TestShopUsage\TestShopUsage.csproj", "{7931AA1B-6527-493A-A1BD-CB6882841845}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC213FC2-202C-4660-B396-BEA78DFE06A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC213FC2-202C-4660-B396-BEA78DFE06A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC213FC2-202C-4660-B396-BEA78DFE06A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC213FC2-202C-4660-B396-BEA78DFE06A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7931AA1B-6527-493A-A1BD-CB6882841845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7931AA1B-6527-493A-A1BD-CB6882841845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7931AA1B-6527-493A-A1BD-CB6882841845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7931AA1B-6527-493A-A1BD-CB6882841845}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
