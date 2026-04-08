@@ -1,0 +1,58 @@
+<Project>
+    <PropertyGroup>
+        <GameDir></GameDir>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="0Harmony">
+            <HintPath>$(GameDir)\MelonLoader\net6\0Harmony.dll</HintPath>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.Common">
+            <HintPath>$(GameDir)\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2CppInterop.Runtime">
+            <HintPath>$(GameDir)\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+        </Reference>
+        <Reference Include="Il2Cppmscorlib">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+        </Reference>
+        <Reference Include="MelonLoader">
+            <HintPath>$(GameDir)\MelonLoader\net6\MelonLoader.dll</HintPath>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UIModule">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+        </Reference>
+        <Reference Include="Unity.InputSystem">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\Unity.InputSystem.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.PhysicsModule">
+            <HintPath>$(GameDir)\MelonLoader\Il2CppAssemblies\UnityEngine.PhysicsModule.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+        <Exec Command="taskkill /f /im &quot;Data Center.exe&quot; /t &gt;nul 2&gt;nul" IgnoreExitCode="true" />
+    </Target>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(GameDir)\Mods\&quot; /Y /I" />
+        <Exec Command="xcopy &quot;$(TargetDir)$(TargetName).pdb&quot; &quot;$(GameDir)\Mods\&quot; /Y /I" />
+        <Exec Command="xcopy &quot;$(TargetDir)$(TargetName).deps.json&quot; &quot;$(GameDir)s\&quot; /Y /I" />
+        <Exec Command="explorer.exe steam://rungameid/4170200" IgnoreExitCode="true" />
+    </Target>
+</Project>

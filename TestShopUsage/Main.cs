@@ -160,10 +160,43 @@ public class Main : MelonMod
         ShopAPI.RegisterItem(new CustomShopItem
         {
             SubCategory = "Bulk Shipments",
-            Name = "RGB Disco Server 32",
+            Name = "RGB Disco Server 33",
             Price = 5020,
             TemplateType = Il2Cpp.PlayerManager.ObjectInHand.Server1U,
             TemplateID = 0
+        });
+        
+        // --- TEST 1: Internal Conflict Test ---
+// We register an item, then immediately try to register another with the exact same Name.
+        ShopAPI.RegisterItem(new CustomShopItem { 
+            Name = "Internal Conflict Server", 
+            Price = 100, 
+            TemplateType = PlayerManager.ObjectInHand.Server1U, 
+            TemplateID = 0 
+        });
+        ShopAPI.RegisterItem(new CustomShopItem { 
+            Name = "Internal Conflict Server", // Identical Name
+            Price = 200, 
+            TemplateType = PlayerManager.ObjectInHand.SFPBox, 
+            TemplateID = 0 
+        });
+
+        // --- TEST 2: External Name Conflict Test ---
+        ShopAPI.RegisterItem(new CustomShopItem {
+            Name = "5x QSFP-DD 400Gbps", 
+            Price = 10,
+            TemplateType = PlayerManager.ObjectInHand.SFPBox,
+            TemplateID = 0
+        });
+
+        // --- TEST 3: External ID Conflict Test ---
+        // It uses SFPBox (which is TemplateType PlayerManager.ObjectInHand.SFPBox).
+        ShopAPI.RegisterItem(new CustomShopItem {
+            Name = "My Custom Box Mod",
+            Price = 500,
+            TemplateType = PlayerManager.ObjectInHand.SFPBox,
+            TemplateID = 0,
+            ResultItemID = 100 
         });
     }
 }

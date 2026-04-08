@@ -5,6 +5,7 @@
         <RootNamespace>DataCenter_CommonShop</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <GameDir>D:\SteamLibrary\steamapps\common\Data Center</GameDir>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -14,11 +15,5 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Reference Include="UnityEngine.TextRenderingModule">
-        <HintPath>D:\SteamLibrary\steamapps\common\Data Center\MelonLoader\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath>
-      </Reference>
-    </ItemGroup>
     <Import Project="..\..\LocalConfigLib.props" Condition="Exists('..\..\LocalConfigLib.props')" />
 </Project>
